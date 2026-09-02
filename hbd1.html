@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday!</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    .font-serif-custom { font-family: 'Sacramento', cursive; }
+    .font-sans-custom { font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    /* Animasi Nyala Api Lilin */
+    @keyframes flicker {
+      0%, 100% { transform: scale(1) rotate(-2deg); opacity: 0.9; }
+      50% { transform: scale(1.15) rotate(2deg); opacity: 1; }
+    }
+    .flame-animation {
+      animation: flicker 0.6s infinite alternate ease-in-out;
+      transform-origin: bottom center;
+    }
+  </style>
+</head>
+<body class="bg-pink-50 font-sans-custom min-h-screen flex items-center justify-center p-4">
+
+  <audio id="bg-music" loop>
+    <!-- <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg"> -->
+    <source src="Selamat-Ulang-Tahun-[Jamrud].mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden border border-pink-100 relative">
+    
+    <button id="music-btn" onclick="toggleMusic()" class="hidden absolute top-4 right-4 z-20 bg-pink-100 text-pink-600 p-2 rounded-full shadow-sm hover:bg-pink-200 transition">
+      🎵
+    </button>
+
+    <section id="step-1" class="p-8 text-center flex flex-col items-center justify-center min-h-[420px]">
+      <div class="text-6xl mb-6 animate-bounce">🎁</div>
+      <h1 class="text-2xl font-bold text-gray-800 mb-2">Ada Pesan Spesial!</h1>
+      <p class="text-gray-500 text-sm mb-6">Siapa nama orang spesial yang lagi ulang tahun hari ini?</p>
+
+      <!-- Input Nama -->
+      <div class="w-full mb-6">
+        <input 
+          type="text" 
+          id="name-input" 
+          placeholder="Masukkan nama kamu..." 
+          class="w-full px-4 py-3 rounded-2xl border border-pink-200 text-center text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition placeholder:text-gray-300 text-sm"
+        />
+        <p id="error-name" class="hidden text-xs text-red-400 mt-2">Isi nama dulu yaa sebelum buka!</p>
+      </div>
+
+      <button onclick="goToStep2()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg shadow-pink-200 transition active:scale-95">
+        Buka Kejutan ✨
+      </button>
+    </section>
+
+    <section id="step-2" class="p-8 text-center flex flex-col items-center justify-center min-h-[420px] hidden">
+      <h2 class="text-xl font-bold text-gray-800 mb-2">Make a Wish! 🕯️</h2>
+      <p class="text-gray-500 text-sm mb-8">Pikirkan satu keinginan, lalu sentuh apinya untuk meniup lilin.</p>
+      
+      <div onclick="blowCandle()" class="cursor-pointer relative flex flex-col items-center justify-center my-4 group">
+        <div id="flame" class="w-4 h-7 bg-amber-400 rounded-full flame-animation shadow-[0_0_12px_#f59e0b]"></div>
+        <div id="wick" class="w-1 h-3 bg-gray-700"></div>
+        <div class="w-4 h-12 bg-pink-300 rounded-t-sm border-b border-pink-400"></div>
+        <div class="w-32 h-16 bg-pink-200 rounded-t-3xl border-t-4 border-white flex items-center justify-center shadow-inner relative">
+          <div class="w-40 h-10 bg-pink-400 rounded-2xl absolute -bottom-4 shadow-md flex justify-around items-center px-2">
+            <span class="text-xs">🍓</span>
+            <span class="text-xs">✨</span>
+            <span class="text-xs">🍓</span>
+          </div>
+        </div>
+      </div>
+
+      <p id="candle-hint" class="text-xs text-pink-400 font-medium mt-8">Tap pada api untuk meniup</p>
+      
+      <button id="next-to-letter" onclick="goToStep3()" class="hidden w-full mt-6 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg shadow-pink-200 transition active:scale-95">
+        Baca Ucapannya 💌
+      </button>
+    </section>
+
+    <section id="step-3" class="p-8 text-center min-h-[420px] hidden">
+      <div class="bg-pink-50/60 p-6 rounded-2xl border border-pink-100 text-left relative">
+        <h3 class="font-serif-custom text-4xl text-pink-600 text-center mb-4">Happy Birthday!</h3>
+        
+        <div class="text-gray-700 text-sm leading-relaxed space-y-3 font-sans-custom">
+          <p>🎉 Selamat ulang tahun ya, <span id="display-name" class="font-bold text-pink-600"></span>! 🎉</p>
+          <p>Semoga di usia yang baru ini, kamu makin bahagia, selalu diberikan kesehatan, dan semua impian yang lagi kamu usahakan satu per satu bisa tercapai.</p>
+          <p>Meskipun kita baru kenal tapi terima kasih ya sudah jadi sosok yang selalu membawa energi positif buat aku. Tetap jadi diri kamu yang luar biasa ya!</p>
+        </div>
+
+        <p class="text-right text-xs font-semibold text-pink-500 mt-6">— Dari aku untuk kamu seng ku 😘</p>
+      </div>
+
+      <!-- <a id="wa-link" href="#" target="_blank" class="mt-6 inline-flex items-center justify-center gap-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg shadow-emerald-100 transition active:scale-95 text-sm">
+        <span>Kirim Balasan ke WhatsApp</span> 📲
+      </a> -->
+
+      <!-- Gantilah tag <a> WhatsApp di Step 3 dengan ini -->
+      <div class="mt-6 text-center space-y-3">
+        <button onclick="showWish()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-2xl shadow-lg shadow-pink-200 transition active:scale-95 text-sm">
+          Tekan untuk Terima Doa Ekstra ✨
+        </button>
+        
+        <!-- Area Hasil Doa (Hidden Awalnya) -->
+        <div id="wish-box" class="hidden p-4 bg-white rounded-2xl border border-pink-200 shadow-sm text-xs text-pink-600 font-medium animate-fade-in">
+          <p id="wish-text"></p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // Konfigurasi Nomor WhatsApp
+    const phoneNumber = "628xxxxxxxxx"; 
+    const waMessage = encodeURIComponent("Makasih ya buat ucapan ulang tahunnya! ❤️");
+
+    const music = document.getElementById("bg-music");
+    const musicBtn = document.getElementById("music-btn");
+    let isBlowing = false;
+
+    // Tambahkan daftar doa acak di script
+  const wishes = [
+    "✨ Semoga tahun ini membawa banyak alasan baru untuk tersenyum!",
+    "🌸 Semoga segala hal baik yang kamu usahakan berjalan lancar.",
+    "☀️ Tetap jadi versi terbaik dari dirimu ya!"
+  ];
+
+    // Set link WA
+    document.getElementById("wa-link").href = `https://wa.me/${phoneNumber}?text=${waMessage}`;
+
+    function toggleMusic() {
+      if (music.paused) {
+        music.play();
+        musicBtn.innerText = "🎵";
+      } else {
+        music.pause();
+        musicBtn.innerText = "🔇";
+      }
+    }
+
+    function goToStep2() {
+      const nameInput = document.getElementById("name-input").value.trim();
+      const errorMsg = document.getElementById("error-name");
+
+      // Validasi jika input nama kosong
+      if (nameInput === "") {
+        errorMsg.classList.remove("hidden");
+        return;
+      }
+
+      errorMsg.classList.add("hidden");
+
+      // Replace teks nama di Step 3
+      document.getElementById("display-name").innerText = nameInput;
+
+      
+      document.getElementById("step-1").classList.add("hidden");
+      document.getElementById("step-2").classList.remove("hidden");
+      
+      // Auto play musik saat mulai interaksi
+      music.play().then(() => {
+        musicBtn.classList.remove("hidden");
+      }).catch(() => {
+        // Handle jika browser memblokir autoplay
+        musicBtn.classList.remove("hidden");
+        musicBtn.innerText = "🔇";
+      });
+    }
+
+    function blowCandle() {
+      if (isBlowing) return;
+      isBlowing = true;
+
+      // Sembunyikan api
+      const flame = document.getElementById("flame");
+      flame.style.display = "none";
+      
+      document.getElementById("candle-hint").innerText = "Lilin berhasil ditiup! ✨";
+
+      // Efek Confetti (Kembang Api Kertas)
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      // Tampilkan tombol lanjut ke surat
+      document.getElementById("next-to-letter").classList.remove("hidden");
+    }
+
+    function goToStep3() {
+      document.getElementById("step-2").classList.add("hidden");
+      document.getElementById("step-3").classList.remove("hidden");
+      
+      // Trigger confetti sekali lagi saat membuka surat
+      confetti({
+        particleCount: 50,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 }
+      });
+      confetti({
+        particleCount: 50,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 }
+      });
+    }
+
+  function showWish() {
+    const wishBox = document.getElementById('wish-box');
+    const wishText = document.getElementById('wish-text');
+    
+    // Pilih doa acak
+    const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
+    wishText.innerText = randomWish;
+    wishBox.classList.remove('hidden');
+
+    // Efek confetti kecil
+    confetti({
+      particleCount: 30,
+      spread: 50,
+      origin: { y: 0.8 }
+    });
+  }
+  </script>
+</body>
+</html>
